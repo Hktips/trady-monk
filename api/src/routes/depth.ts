@@ -1,12 +1,16 @@
-import express from "express";
-const app=express();
-app.use(express.json());
 
+import { Router } from "express";
 
+export const depthRouter = Router();
 
-app.listen(3000,()=>{
-    console.log("server lister on port 3000");
-})
+depthRouter.get("/", async (req, res) => {
+    const { symbol } = req.query;
+    const response = await RedisManager.getInstance().sendAndAwait({
+        type: GET_DEPTH,
+        data: {
+            market: symbol as string
+        }
+    });
 
-
-
+    res.json(response.payload);
+});
