@@ -27,4 +27,14 @@ orderRouter.delete("/",async(req,res)=>{
         }
     });
     res.json(response.payload);
-})
+});
+orderRouter.get("/open", async (req, res) => {
+    const response = await RedisManager.getInstance().sendAndAwait({
+        type: GET_OPEN_ORDERS,
+        data: {
+            userId: req.query.userId as string,
+            market: req.query.market as string
+        }
+    });
+    res.json(response.payload);
+});
