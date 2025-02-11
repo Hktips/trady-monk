@@ -1,5 +1,7 @@
 
 import { Router } from "express";
+import { RedisManager } from "../RedishManager";
+import { GET_DEPTH } from "../types";
 
 export const depthRouter = Router();
 
