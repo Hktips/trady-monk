@@ -78,4 +78,32 @@ export class Orderbook {
             }
         }
     }
+    matchBid(order:Order):{fills:Fill[],executedQty:number}{
+      const fills:Fill[]=[];
+      let executedQty=0;
+      for(let i=0;i<this.asks.length;i++){
+        if(this.asks[i].price<=order.price && executedQty<order.quantity){
+          const filledQty=Math.min((order.quantity-executedQty),this.asks[i].quantity)
+          executedQty+=filledQty;
+          this.asks[i].filled+=filledQty;
+          fills.push({
+            price: this.asks[i].price.toString(),
+            qty: filledQty,
+            tradeId: this.lastTradeId++,
+            otherUserId: this.asks[i].userId,
+            markerOrderId: this.asks[i].orderId
+          })
+        }
+      }
+      for(let i=0; i<this.asks.length; i++){
+        if(this.asks[i].filled===this.asks[i].quantity){
+          this.asks.splice(i,1)
+          i--;
+        }
+      }
+      return {
+        fills,
+        executedQty
+      };
+    }
   }
