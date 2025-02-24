@@ -106,4 +106,33 @@ export class Orderbook {
         executedQty
       };
     }
+    matchAsk(order: Order): {fills: Fill[], executedQty: number} {
+      const fills: Fill[] = [];
+      let executedQty = 0;
+      
+      for (let i = 0; i < this.bids.length; i++) {
+          if (this.bids[i].price >= order.price && executedQty < order.quantity) {
+              const amountRemaining = Math.min(order.quantity - executedQty, this.bids[i].quantity);
+              executedQty += amountRemaining;
+              this.bids[i].filled += amountRemaining;
+              fills.push({
+                  price: this.bids[i].price.toString(),
+                  qty: amountRemaining,
+                  tradeId: this.lastTradeId++,
+                  otherUserId: this.bids[i].userId,
+                  markerOrderId: this.bids[i].orderId
+              });
+          }
+      }
+      for (let i = 0; i < this.bids.length; i++) {
+          if (this.bids[i].filled === this.bids[i].quantity) {
+              this.bids.splice(i, 1);
+              i--;
+          }
+      }
+      return {
+          fills,
+          executedQty
+      };
+    }
   }
