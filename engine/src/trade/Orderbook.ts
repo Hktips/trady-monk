@@ -173,4 +173,21 @@ export class Orderbook {
       const bids=this.bids.filter(x=> x.userId===userId);
       return[...asks,...bids];
     }
-  }
+    canceelBId(order:Order){
+      const index=this.bids.findIndex(x=> x.orderId==order.orderId);
+       if(index !==-1){
+        const price=this.bids[index].price;
+        this.bids.splice(index,1);
+        return price
+       }
+    }
+    cancelAsk(order: Order) {
+      const index = this.asks.findIndex(x => x.orderId === order.orderId);
+      if (index !== -1) {
+          const price = this.asks[index].price;
+          this.asks.splice(index, 1);
+          return price
+      }
+    }
+    
+    }
