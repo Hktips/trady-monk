@@ -168,7 +168,37 @@ export class Engine {
                             addOrderbook(orderbook:Orderbook){
                             this.orderbooks.push(orderbook);
                             }
+
+
+                            //===========================
                               
-                    
+                    createOrder(market:string,price:string,quantity:string,side:"buy"|"sell",userId:string){
+                        const orderbook=this.orderbooks.find(o=>o.ticker()===market);
+                        const baseAsset=market.split("-")[0];
+                        const quoteAsset=market.split("-")[1];
+                        if(!orderbook){
+                            throw new Error("No orderbook found");
+                        }
+                        this.checkAndLockFunds(baseAsset,quoteAsset,side,userId,quoteAsset,price,quantity);
+                        const order:Order={
+                            price:Number(price),
+                            quantity:Number(quantity),
+                            orderId:Math.random().toString(36).substring(2,15)+Math.random().toString(36).substring(2,15),
+                            filled:0,
+                            side,
+                            userId
+                        }
+                        const {fills,executedQty}=orderbook.addOrder(order);
+                        this.updateBalances(userId,baseAsset,quoteAsset,side,fills,executedQty);
+                        this.creatDbTrades(fills,market,userId);
+                        this.UpdateDbOrders(order,executedQty,fills,market);
+                        this.publishWsDepthUpdates(fills,price,side,market);
+                        this.PublishWsTrades(fills,userId,market);
+                        retrun{executedQty,fills,orderId:order.orderId};
+
+
+                    }
+                  
+                
  }
                        
