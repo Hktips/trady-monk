@@ -169,8 +169,6 @@ export class Engine {
                             this.orderbooks.push(orderbook);
                             }
 
-
-                            //===========================
                               
                     createOrder(market:string,price:string,quantity:string,side:"buy"|"sell",userId:string){
                         const orderbook=this.orderbooks.find(o=>o.ticker()===market);
@@ -198,7 +196,28 @@ export class Engine {
 
 
                     }
-                  
+                    updateDbOrders(order:Order,executedQty:number,fills:fills:Fill[],market:string){
+                        RedisManager.getInstance().pushMessage({
+                            type:ORDER_UPDATE,
+                            data:{
+                                orderId:order.orderId,
+                                executedQty:executedQty,
+                                market:market,
+                                price:order.price.toString(),
+                                quantity:order.quantity.toString(),
+
+
+                        });
+                        fills.forEach(fill=>{
+                            RedisManager.getInstance().pushMessage({
+                                type:ORDER_UPDATE,
+                                data:{
+                                    orderId:fill.markrOrderId,
+                                    executedQty:fill
+                                }
+                            })
+                        })
+                    }
                 
  }
                        
