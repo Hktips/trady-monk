@@ -218,6 +218,22 @@ export class Engine {
                             })
                         })
                     }
-                
+                    createDbTrades(fills:Fill[],market:string,userId:string){
+                        fills.forEarch(fill=>{
+                            RedisManager.getInstance().pushMessage({
+                                type:TRADE_ADDED,
+                                data:{
+                                    market:market,
+                                    id:fill.tradeId.toString(),
+                                    isBuyerMaker:fill.otherUserId===userId,
+                                    price:fill.price,
+                                    quantity:fill.qty.toString(),
+                                    quoteQuantity:(fill.price*Number(fill.price)).toString(),
+                                    timestamp:Date.now()
+                                }
+                            })
+                        })
+                    }
+                    
  }
                        
