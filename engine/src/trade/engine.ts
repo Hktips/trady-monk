@@ -234,6 +234,22 @@ export class Engine {
                             })
                         })
                     }
-                    
+                    publishWsTrades(fills: Fill[], userId: string, market: string) {
+                        fills.forEach(fill => {
+                            RedisManager.getInstance().publishMessage(`trade@${market}`, {
+                                stream: `trade@${market}`,
+                                data: {
+                                    e: "trade",
+                                    t: fill.tradeId,
+                                    m: fill.otherUserId === userId, // TODO: Is this right?
+                                    p: fill.price,
+                                    q: fill.qty.toString(),
+                                    s: market,
+                                }
+                            });
+                        });
+                    }
+                   
+                
  }
                        
