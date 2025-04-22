@@ -249,6 +249,24 @@ export class Engine {
                             });
                         });
                     }
+                    sendUpdatedDepthAt(price: string, market: string) {
+                        const orderbook = this.orderbooks.find(o => o.ticker() === market);
+                        if (!orderbook) {
+                            return;
+                        }
+                        const depth = orderbook.getDepth();
+                        const updatedBids = depth?.bids.filter(x => x[0] === price);
+                        const updatedAsks = depth?.asks.filter(x => x[0] === price);
+                        
+                        RedisManager.getInstance().publishMessage(`depth@${market}`, {
+                            stream: `depth@${market}`,
+                            data: {
+                                a: updatedAsks.length ? updatedAsks : [[price, "0"]],
+                                b: updatedBids.length ? updatedBids : [[price, "0"]],
+                                e: "depth"
+                            }
+                        });
+                    }
                    
                 
  }
